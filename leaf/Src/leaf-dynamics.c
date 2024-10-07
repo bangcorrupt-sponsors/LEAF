@@ -83,7 +83,7 @@ void tCompressor_free (tCompressor* const comp)
     mpool_free((char*)c, c->mempool);
 }
 
-Lfloat tCompressor_tick(tCompressor* const comp, Lfloat in)
+Lfloat  tCompressor_tick(tCompressor* const comp, Lfloat in)
 {
     _tCompressor* c = *comp;
     
@@ -144,8 +144,7 @@ Lfloat tCompressor_tickWithTable(tCompressor* const comp, Lfloat in)
 
     Lfloat slope, overshoot;
 
-    in = fastabsf(in);
-    int inAmpIndex = LEAF_clip (0, (in * c->atodbScalar) - c->atodbOffset, c->atodbTableSizeMinus1);
+    int inAmpIndex = LEAF_clip (0, (fastabsf(in) * c->atodbScalar) - c->atodbOffset, c->atodbTableSizeMinus1);
     Lfloat in_db = c->atodbTable[inAmpIndex];
     Lfloat out_db = 0.0f;
 
@@ -192,8 +191,7 @@ Lfloat tCompressor_tickWithTableHardKnee(tCompressor* const comp, Lfloat in)
 
     Lfloat slope, overshoot;
 
-    in = fastabsf(in);
-    int inAmpIndex = LEAF_clip (0, (in * c->atodbScalar) - c->atodbOffset, c->atodbTableSizeMinus1);
+    int inAmpIndex = LEAF_clip (0, (fastabsf(in) * c->atodbScalar) - c->atodbOffset, c->atodbTableSizeMinus1);
     Lfloat in_db = c->atodbTable[inAmpIndex];
     Lfloat out_db = 0.0f;
 

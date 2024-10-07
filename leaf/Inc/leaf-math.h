@@ -108,13 +108,9 @@ extern "C" {
 #define log10f_fast(x)  (log2f_approx(x)*0.3010299956639812f)
 #define twelfthRootOf2    1.0594630943592952646f
 
-#ifdef ITCMRAM
-Lfloat __attribute__ ((section(".itcmram"))) __attribute__ ((aligned (32))) LEAF_clip(Lfloat min, Lfloat val, Lfloat max)
-#else
-    inline Lfloat LEAF_clip(Lfloat min, Lfloat val, Lfloat max)
-#endif
-{
 
+inline Lfloat LEAF_clip(Lfloat min, Lfloat val, Lfloat max)
+{
     if (val < min)
     {
         return min;
@@ -640,10 +636,17 @@ inline Lfloat   fast_tanh4 (Lfloat x)
 
 inline float InvSqrt(float x)
 {
+	//should change the type-punned pointers to use unions, but I tried it and didn't get it working-JS
     Lfloat xhalf = 0.5f*x;
+
     int i = *(int*)&x; // get bits for floating value
-    i = 0x5f3759df - (i>>1); // gives initial guess y0
-    x = *(Lfloat*)&i; // convert bits back to float
+    //union unholy_t unholy;
+    //unholy.i = x;
+    //unholy.i = 0x5f3759df - (unholy.i>>1); // gives initial guess y0
+
+     x = *(Lfloat*)&i; // convert bits back to float
+   // x = unholy.f;
+
     x = x*(1.5f-xhalf*x*x); // Newton step, repeating increases accuracy
     return x;
 }
@@ -699,23 +702,20 @@ inline Lfloat fastSine(Lfloat x)
 inline Lfloat LEAF_poly_blep(Lfloat t, Lfloat dt)
 {
     dt = fabsf(dt);
-    if (dt >= 0.0f)
-    {
-        // 0 <= t < 1
-        if (t < dt)
-        {
-            t /= dt;
-            return t+t - t*t - 1.0f;
-        }
-        // -1 < t < 0
-        else if (t > 1.0f - dt)
-        {
-            t = (t - 1.0f) / dt;
-            return t*t + t+t + 1.0f;
-        }
-        // 0 otherwise
-        else return 0.0f;
-    }
+	// 0 <= t < 1
+	if (t < dt)
+	{
+		t /= dt;
+		return t+t - t*t - 1.0f;
+	}
+	// -1 < t < 0
+	else if (t > 1.0f - dt)
+	{
+		t = (t - 1.0f) / dt;
+		return t*t + t+t + 1.0f;
+	}
+	// 0 otherwise
+	else return 0.0f;
 
 //this version is from this discussion: https://dsp.stackexchange.com/questions/54790/polyblamp-anti-aliasing-in-c
 //    dt = -1.0f*dt;

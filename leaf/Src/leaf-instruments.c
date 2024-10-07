@@ -459,8 +459,6 @@ void t808Snare_setNoiseFilterQ(t808Snare* const snareInst, Lfloat noiseFilterQ)
     tSVF_setQ(&snare->noiseLowpass, noiseFilterQ);
 }
 
-static Lfloat tone[2];
-
 Lfloat t808Snare_tick(t808Snare* const snareInst)
 {
     _t808Snare* snare = *snareInst;
